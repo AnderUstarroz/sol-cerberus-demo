@@ -1,0 +1,6 @@
+[submodule "deps/metaplex-program-library"]
+	path = deps/metaplex-program-library
+	url = https://github.com/metaplex-foundation/metaplex-program-library
+[submodule "deps/sol-cerberus"]
+	path = deps/sol-cerberus
+	url = https://github.com/AnderUstarroz/sol-cerberus
