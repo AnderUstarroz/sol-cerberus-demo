@@ -2,8 +2,8 @@ use anchor_lang::prelude::*;
 
 #[derive(AnchorSerialize, AnchorDeserialize, Default, Clone, Debug)]
 pub struct Square {
-    size: u16,
-    color: String,
+    pub size: u16,
+    pub color: String,
 }
 
 impl Square {
@@ -20,8 +20,8 @@ impl Square {
 
 #[derive(AnchorSerialize, AnchorDeserialize, Default, Clone, Debug)]
 pub struct Circle {
-    size: u16,
-    color: String,
+    pub size: u16,
+    pub color: String,
 }
 
 impl Circle {
@@ -35,8 +35,8 @@ impl Circle {
 
 #[derive(AnchorSerialize, AnchorDeserialize, Default, Clone, Debug)]
 pub struct Triangle {
-    size: u16,
-    color: String,
+    pub size: u16,
+    pub color: String,
 }
 impl Triangle {
     pub const fn new(size: u16, color: String) -> Self {

@@ -1,13 +1,10 @@
 import * as anchor from "@project-serum/anchor";
 import { DEMO_PROGRAM } from "./constants";
 
-export async function demo_pda(scAppPda: anchor.web3.PublicKey) {
+export async function demo_pda(scAppId: anchor.web3.PublicKey) {
   return (
     await anchor.web3.PublicKey.findProgramAddressSync(
-      [
-        anchor.utils.bytes.utf8.encode("sol-cerberus-demo"),
-        scAppPda.toBuffer(),
-      ],
+      [anchor.utils.bytes.utf8.encode("sol-cerberus-demo"), scAppId.toBuffer()],
       DEMO_PROGRAM.programId
     )
   )[0];
