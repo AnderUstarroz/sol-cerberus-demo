@@ -1,29 +1,28 @@
 import {
-  nft_metadata_pda,
   sc_app_pda,
   sc_role_pda,
   sc_rule_pda,
+  SolCerberus,
 } from "sol-cerberus-js";
-import { getAssociatedTokenAddress } from "@solana/spl-token";
 import {
   DEMO_PROGRAM,
   SC_APP_ID,
-  SOL_CERBERUS,
   addressType,
   METAPLEX,
   USER_WITH_NFT2,
   PROVIDER_WALLET,
+  PROVIDER,
 } from "./constants";
 import { expect } from "chai";
 import { demo_pda } from "./common";
 
 describe("Triangle master", () => {
+  let solCerberus: SolCerberus = null; // Populated on before() block
   let appPda = null; // Populated on before() block
-  let demoPda = null; // Populated on before() block
+  let demoPda = null;
   let resource = "Triangle";
   let collection = null;
   let nftAllowedCollection = null;
-  let tokenAccountPda = null;
   let role = "TriangleMaster";
   let rolePda = null;
   let addPerm = "Add";
@@ -32,9 +31,11 @@ describe("Triangle master", () => {
   let updateRulePda = null;
   let deletePerm = "Delete";
   let deleteRulePda = null;
-  let metadataPDA = null;
+  let myRoles = null;
 
   before(async () => {
+    solCerberus = new SolCerberus(SC_APP_ID, PROVIDER);
+    solCerberus.wallet = USER_WITH_NFT2.publicKey;
     appPda = await sc_app_pda(SC_APP_ID);
     demoPda = await demo_pda(SC_APP_ID);
     addRulePda = await sc_rule_pda(SC_APP_ID, role, resource, addPerm);
@@ -57,14 +58,9 @@ describe("Triangle master", () => {
       collectionAuthority: PROVIDER_WALLET.payer, // This will set the Collection verified flag to true
     });
     rolePda = await sc_role_pda(SC_APP_ID, role, collection.mintAddress);
-    tokenAccountPda = await getAssociatedTokenAddress(
-      nftAllowedCollection.mintAddress,
-      USER_WITH_NFT2.publicKey
-    );
-    metadataPDA = await nft_metadata_pda(nftAllowedCollection.mintAddress);
   });
   it(`Assign "${role}" role to NFT collection address`, async () => {
-    await SOL_CERBERUS.methods
+    await solCerberus.program.methods
       .assignRole({
         address: collection.mintAddress,
         role: role,
@@ -76,6 +72,9 @@ describe("Triangle master", () => {
         role: rolePda,
       })
       .rpc();
+    myRoles = await solCerberus.assignedRoles([collection.mintAddress], {
+      [collection.mintAddress]: nftAllowedCollection.mintAddress,
+    });
   });
 
   it("Not allowed to: Add, Update, Delete", async () => {
@@ -84,13 +83,8 @@ describe("Triangle master", () => {
         .addTriangle("ff0000", 50)
         .accounts({
           demo: demoPda,
-          solCerberusApp: appPda,
-          solCerberusRule: null,
-          solCerberusRole: null,
-          solCerberusTokenAcc: tokenAccountPda,
-          solCerberusMetadata: metadataPDA,
-          solCerberus: SOL_CERBERUS.programId,
           signer: USER_WITH_NFT2.publicKey,
+          ...(await solCerberus.accounts(myRoles, "Triangle", "Add")),
         })
         .signers([USER_WITH_NFT2])
         .rpc(),
@@ -98,13 +92,8 @@ describe("Triangle master", () => {
         .updateTriangle("ff0000", 50)
         .accounts({
           demo: demoPda,
-          solCerberusApp: appPda,
-          solCerberusRule: null,
-          solCerberusRole: null,
-          solCerberusTokenAcc: tokenAccountPda,
-          solCerberusMetadata: metadataPDA,
-          solCerberus: SOL_CERBERUS.programId,
           signer: USER_WITH_NFT2.publicKey,
+          ...(await solCerberus.accounts(myRoles, "Triangle", "Update")),
         })
         .signers([USER_WITH_NFT2])
         .rpc(),
@@ -112,13 +101,8 @@ describe("Triangle master", () => {
         .deleteTriangle()
         .accounts({
           demo: demoPda,
-          solCerberusApp: appPda,
-          solCerberusRule: null,
-          solCerberusRole: null,
-          solCerberusTokenAcc: tokenAccountPda,
-          solCerberusMetadata: metadataPDA,
-          solCerberus: SOL_CERBERUS.programId,
           signer: USER_WITH_NFT2.publicKey,
+          ...(await solCerberus.accounts(myRoles, "Triangle", "Delete")),
         })
         .signers([USER_WITH_NFT2])
         .rpc(),
@@ -134,7 +118,7 @@ describe("Triangle master", () => {
   });
 
   it("Allow Add", async () => {
-    await SOL_CERBERUS.methods
+    await solCerberus.program.methods
       .addRule({
         namespace: 0,
         role: role,
@@ -148,17 +132,13 @@ describe("Triangle master", () => {
       })
       .rpc();
 
+    await solCerberus.fetchPerms();
     await DEMO_PROGRAM.methods
       .addTriangle("ff0000", 50)
       .accounts({
         demo: demoPda,
-        solCerberusApp: appPda,
-        solCerberusRule: addRulePda,
-        solCerberusRole: rolePda,
-        solCerberusTokenAcc: tokenAccountPda,
-        solCerberusMetadata: metadataPDA,
-        solCerberus: SOL_CERBERUS.programId,
         signer: USER_WITH_NFT2.publicKey,
+        ...(await solCerberus.accounts(myRoles, "Triangle", "Add")),
       })
       .signers([USER_WITH_NFT2])
       .rpc();
@@ -168,7 +148,7 @@ describe("Triangle master", () => {
   });
 
   it("Allow Update", async () => {
-    await SOL_CERBERUS.methods
+    await solCerberus.program.methods
       .addRule({
         namespace: 0,
         role: role,
@@ -181,18 +161,13 @@ describe("Triangle master", () => {
         rule: updateRulePda,
       })
       .rpc();
-
+    await solCerberus.fetchPerms();
     await DEMO_PROGRAM.methods
       .updateTriangle("0f0f0f", 60)
       .accounts({
         demo: demoPda,
-        solCerberusApp: appPda,
-        solCerberusRule: updateRulePda,
-        solCerberusRole: rolePda,
-        solCerberusTokenAcc: tokenAccountPda,
-        solCerberusMetadata: metadataPDA,
-        solCerberus: SOL_CERBERUS.programId,
         signer: USER_WITH_NFT2.publicKey,
+        ...(await solCerberus.accounts(myRoles, "Triangle", "Update")),
       })
       .signers([USER_WITH_NFT2])
       .rpc();
@@ -201,7 +176,7 @@ describe("Triangle master", () => {
     expect(demo.triangle.color).to.equal("0f0f0f");
   });
   it("Allow Delete", async () => {
-    await SOL_CERBERUS.methods
+    await solCerberus.program.methods
       .addRule({
         namespace: 0,
         role: role,
@@ -214,22 +189,20 @@ describe("Triangle master", () => {
         rule: deleteRulePda,
       })
       .rpc();
-
+    await solCerberus.fetchPerms();
     await DEMO_PROGRAM.methods
       .deleteTriangle()
       .accounts({
         demo: demoPda,
-        solCerberusApp: appPda,
-        solCerberusRule: deleteRulePda,
-        solCerberusRole: rolePda,
-        solCerberusTokenAcc: tokenAccountPda,
-        solCerberusMetadata: metadataPDA,
-        solCerberus: SOL_CERBERUS.programId,
         signer: USER_WITH_NFT2.publicKey,
+        ...(await solCerberus.accounts(myRoles, "Triangle", "Delete")),
       })
       .signers([USER_WITH_NFT2])
       .rpc();
     let demo = await DEMO_PROGRAM.account.demo.fetch(demoPda);
     expect(demo.triangle).to.equal(null);
+  });
+  after(async () => {
+    solCerberus.destroy();
   });
 });

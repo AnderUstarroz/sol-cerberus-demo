@@ -1,6 +1,5 @@
 import * as anchor from "@project-serum/anchor";
 import { SolCerberus, SOL_CERBERUS_PROGRAM_ID } from "sol-cerberus-js";
-import SolCerberusIDL from "sol-cerberus-js/lib/idl.json";
 import { SolCerberusDemo } from "../target/types/sol_cerberus_demo";
 import NodeWallet from "@project-serum/anchor/dist/cjs/nodewallet";
 import { keypairIdentity, Metaplex } from "@metaplex-foundation/js";
@@ -12,11 +11,6 @@ export const PROVIDER = anchor.AnchorProvider.env();
 export const PROVIDER_WALLET = (DEMO_PROGRAM.provider as anchor.AnchorProvider)
   .wallet as NodeWallet;
 
-export const SOL_CERBERUS: anchor.Program<SolCerberus> = new anchor.Program(
-  SolCerberusIDL as any,
-  SOL_CERBERUS_PROGRAM_ID,
-  PROVIDER
-);
 export const SC_APP_ID = new anchor.web3.PublicKey(
   "3cJ5FiDpAYuFj2JQR3W3q1NDR7KrzKXFarJP7pqmRtko"
 );

@@ -1,12 +1,15 @@
-import { sc_app_pda } from "sol-cerberus-js";
-import { DEMO_PROGRAM, PROVIDER, SC_APP_ID, SOL_CERBERUS } from "./constants";
+import { sc_app_pda, SolCerberus } from "sol-cerberus-js";
+import { DEMO_PROGRAM, PROVIDER, SC_APP_ID } from "./constants";
 import { expect } from "chai";
 import { demo_pda, safe_airdrop } from "./common";
 import * as anchor from "@project-serum/anchor";
 
 describe("Initialize", () => {
+  let solCerberus: SolCerberus = null; // Populated on before() block
   let appPda = null; // Populated on before() block
+
   before(async () => {
+    solCerberus = new SolCerberus(SC_APP_ID, PROVIDER);
     appPda = await sc_app_pda(SC_APP_ID);
     // Request SOL to create NFTs on next tests
     safe_airdrop(
@@ -16,18 +19,18 @@ describe("Initialize", () => {
     );
   });
 
-  it("Create Access Control List", async () => {
-    await SOL_CERBERUS.methods
+  it("Create Role-Based Access Control (RBAC)", async () => {
+    await solCerberus.program.methods
       .initializeApp({
         id: SC_APP_ID,
         recovery: null,
-        name: "SolCerberusACL",
+        name: "SolCerberusRBAC",
       })
       .accounts({
         app: appPda,
       })
       .rpc();
-    let app = await SOL_CERBERUS.account.app.fetch(appPda);
+    let app = await solCerberus.program.account.app.fetch(appPda);
     expect(app.id.toBase58()).to.equal(SC_APP_ID.toBase58());
   });
 

@@ -1,17 +1,23 @@
-import { sc_app_pda, sc_role_pda, sc_rule_pda } from "sol-cerberus-js";
+import {
+  sc_app_pda,
+  sc_role_pda,
+  sc_rule_pda,
+  SolCerberus,
+} from "sol-cerberus-js";
 import {
   DEMO_PROGRAM,
   SC_APP_ID,
-  SOL_CERBERUS,
   ALLOWED_WALLET,
   addressType,
+  PROVIDER,
 } from "./constants";
 import { expect } from "chai";
 import { demo_pda } from "./common";
 
 describe("Square master", () => {
-  let appPda = null; // Populated on before() block
-  let demoPda = null; // Populated on before() block
+  let solCerberus: SolCerberus = null; // Populated on before() block
+  let appPda = null;
+  let demoPda = null;
   let resource = "Square";
   let role = "SquareMaster";
   let rolePda = null;
@@ -21,8 +27,10 @@ describe("Square master", () => {
   let updateRulePda = null;
   let deletePerm = "Delete";
   let deleteRulePda = null;
+  let myRoles = null;
 
   before(async () => {
+    solCerberus = new SolCerberus(SC_APP_ID, PROVIDER);
     appPda = await sc_app_pda(SC_APP_ID);
     demoPda = await demo_pda(SC_APP_ID);
     rolePda = await sc_role_pda(SC_APP_ID, role, ALLOWED_WALLET.publicKey);
@@ -31,7 +39,7 @@ describe("Square master", () => {
     deleteRulePda = await sc_rule_pda(SC_APP_ID, role, resource, deletePerm);
   });
   it(`Assign "${role}" role to Wallet`, async () => {
-    await SOL_CERBERUS.methods
+    await solCerberus.program.methods
       .assignRole({
         address: ALLOWED_WALLET.publicKey,
         role: role,
@@ -43,6 +51,7 @@ describe("Square master", () => {
         role: rolePda,
       })
       .rpc();
+    myRoles = await solCerberus.assignedRoles([ALLOWED_WALLET.publicKey]);
   });
 
   it("Not allowed to: Add, Update, Delete", async () => {
@@ -51,13 +60,8 @@ describe("Square master", () => {
         .addSquare("ff0000", 50)
         .accounts({
           demo: demoPda,
-          solCerberusApp: appPda,
-          solCerberusRule: null,
-          solCerberusRole: null,
-          solCerberusTokenAcc: null,
-          solCerberusMetadata: null,
-          solCerberus: SOL_CERBERUS.programId,
           signer: ALLOWED_WALLET.publicKey,
+          ...(await solCerberus.accounts(myRoles, "Square", "Add")),
         })
         .signers([ALLOWED_WALLET])
         .rpc(),
@@ -65,13 +69,8 @@ describe("Square master", () => {
         .updateSquare("ff0000", 50)
         .accounts({
           demo: demoPda,
-          solCerberusApp: appPda,
-          solCerberusRule: null,
-          solCerberusRole: null,
-          solCerberusTokenAcc: null,
-          solCerberusMetadata: null,
-          solCerberus: SOL_CERBERUS.programId,
           signer: ALLOWED_WALLET.publicKey,
+          ...(await solCerberus.accounts(myRoles, "Square", "Update")),
         })
         .signers([ALLOWED_WALLET])
         .rpc(),
@@ -79,13 +78,8 @@ describe("Square master", () => {
         .deleteSquare()
         .accounts({
           demo: demoPda,
-          solCerberusApp: appPda,
-          solCerberusRule: null,
-          solCerberusRole: null,
-          solCerberusTokenAcc: null,
-          solCerberusMetadata: null,
-          solCerberus: SOL_CERBERUS.programId,
           signer: ALLOWED_WALLET.publicKey,
+          ...(await solCerberus.accounts(myRoles, "Square", "Delete")),
         })
         .signers([ALLOWED_WALLET])
         .rpc(),
@@ -101,7 +95,7 @@ describe("Square master", () => {
   });
 
   it("Allow Add", async () => {
-    await SOL_CERBERUS.methods
+    await solCerberus.program.methods
       .addRule({
         namespace: 0,
         role: role,
@@ -115,17 +109,13 @@ describe("Square master", () => {
       })
       .rpc();
 
+    await solCerberus.fetchPerms();
     await DEMO_PROGRAM.methods
       .addSquare("ff0000", 50)
       .accounts({
         demo: demoPda,
-        solCerberusApp: appPda,
-        solCerberusRule: addRulePda,
-        solCerberusRole: rolePda,
-        solCerberusTokenAcc: null,
-        solCerberusMetadata: null,
-        solCerberus: SOL_CERBERUS.programId,
         signer: ALLOWED_WALLET.publicKey,
+        ...(await solCerberus.accounts(myRoles, "Square", "Add")),
       })
       .signers([ALLOWED_WALLET])
       .rpc();
@@ -135,7 +125,7 @@ describe("Square master", () => {
   });
 
   it("Allow Update", async () => {
-    await SOL_CERBERUS.methods
+    await solCerberus.program.methods
       .addRule({
         namespace: 0,
         role: role,
@@ -148,18 +138,13 @@ describe("Square master", () => {
         rule: updateRulePda,
       })
       .rpc();
-
+    await solCerberus.fetchPerms();
     await DEMO_PROGRAM.methods
       .updateSquare("0f0f0f", 60)
       .accounts({
         demo: demoPda,
-        solCerberusApp: appPda,
-        solCerberusRule: updateRulePda,
-        solCerberusRole: rolePda,
-        solCerberusTokenAcc: null,
-        solCerberusMetadata: null,
-        solCerberus: SOL_CERBERUS.programId,
         signer: ALLOWED_WALLET.publicKey,
+        ...(await solCerberus.accounts(myRoles, "Square", "Update")),
       })
       .signers([ALLOWED_WALLET])
       .rpc();
@@ -168,7 +153,7 @@ describe("Square master", () => {
     expect(demo.square.color).to.equal("0f0f0f");
   });
   it("Allow Delete", async () => {
-    await SOL_CERBERUS.methods
+    await solCerberus.program.methods
       .addRule({
         namespace: 0,
         role: role,
@@ -181,22 +166,20 @@ describe("Square master", () => {
         rule: deleteRulePda,
       })
       .rpc();
-
+    await solCerberus.fetchPerms();
     await DEMO_PROGRAM.methods
       .deleteSquare()
       .accounts({
         demo: demoPda,
-        solCerberusApp: appPda,
-        solCerberusRule: deleteRulePda,
-        solCerberusRole: rolePda,
-        solCerberusTokenAcc: null,
-        solCerberusMetadata: null,
-        solCerberus: SOL_CERBERUS.programId,
         signer: ALLOWED_WALLET.publicKey,
+        ...(await solCerberus.accounts(myRoles, "Square", "Delete")),
       })
       .signers([ALLOWED_WALLET])
       .rpc();
     let demo = await DEMO_PROGRAM.account.demo.fetch(demoPda);
     expect(demo.square).to.equal(null);
+  });
+  after(async () => {
+    solCerberus.destroy();
   });
 });

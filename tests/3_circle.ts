@@ -1,22 +1,26 @@
-import { sc_app_pda, sc_role_pda, sc_rule_pda } from "sol-cerberus-js";
-import { getAssociatedTokenAddress } from "@solana/spl-token";
+import {
+  sc_app_pda,
+  sc_role_pda,
+  sc_rule_pda,
+  SolCerberus,
+} from "sol-cerberus-js";
 import {
   DEMO_PROGRAM,
   SC_APP_ID,
-  SOL_CERBERUS,
   addressType,
   METAPLEX,
   USER_WITH_NFT1,
+  PROVIDER,
 } from "./constants";
 import { expect } from "chai";
 import { demo_pda } from "./common";
 
 describe("Circle master", () => {
+  let solCerberus: SolCerberus = null; // Populated on before() block
   let appPda = null; // Populated on before() block
-  let demoPda = null; // Populated on before() block
+  let demoPda = null;
   let resource = "Circle";
   let allowedNft = null;
-  let tokenAccountPda = null;
   let role = "CircleMaster";
   let rolePda = null;
   let addPerm = "Add";
@@ -25,11 +29,13 @@ describe("Circle master", () => {
   let updateRulePda = null;
   let deletePerm = "Delete";
   let deleteRulePda = null;
+  let myRoles = null;
 
   before(async () => {
+    solCerberus = new SolCerberus(SC_APP_ID, PROVIDER);
+    solCerberus.wallet = USER_WITH_NFT1.publicKey;
     appPda = await sc_app_pda(SC_APP_ID);
     demoPda = await demo_pda(SC_APP_ID);
-    rolePda = await sc_role_pda(SC_APP_ID, role, USER_WITH_NFT1.publicKey);
     addRulePda = await sc_rule_pda(SC_APP_ID, role, resource, addPerm);
     updateRulePda = await sc_rule_pda(SC_APP_ID, role, resource, updatePerm);
     deleteRulePda = await sc_rule_pda(SC_APP_ID, role, resource, deletePerm);
@@ -40,22 +46,14 @@ describe("Circle master", () => {
       tokenOwner: USER_WITH_NFT1.publicKey,
       isMutable: true,
     });
-    tokenAccountPda = await getAssociatedTokenAddress(
-      allowedNft.mintAddress,
-      USER_WITH_NFT1.publicKey
-    );
+    rolePda = await sc_role_pda(SC_APP_ID, role, allowedNft.mintAddress);
   });
   it(`Assign "${role}" role to NFT`, async () => {
-    const rolePda = await sc_role_pda(
-      SC_APP_ID,
-      role,
-      USER_WITH_NFT1.publicKey
-    );
-    await SOL_CERBERUS.methods
+    await solCerberus.program.methods
       .assignRole({
-        address: USER_WITH_NFT1.publicKey,
+        address: allowedNft.mintAddress,
         role: role,
-        addressType: addressType.Wallet,
+        addressType: addressType.NFT,
         expiresAt: null,
       })
       .accounts({
@@ -63,6 +61,7 @@ describe("Circle master", () => {
         role: rolePda,
       })
       .rpc();
+    myRoles = await solCerberus.assignedRoles([allowedNft.mintAddress]);
   });
 
   it("Not allowed to: Add, Update, Delete", async () => {
@@ -71,13 +70,8 @@ describe("Circle master", () => {
         .addCircle("ff0000", 50)
         .accounts({
           demo: demoPda,
-          solCerberusApp: appPda,
-          solCerberusRule: null,
-          solCerberusRole: null,
-          solCerberusTokenAcc: tokenAccountPda,
-          solCerberusMetadata: null,
-          solCerberus: SOL_CERBERUS.programId,
           signer: USER_WITH_NFT1.publicKey,
+          ...(await solCerberus.accounts(myRoles, "Circle", "Add")),
         })
         .signers([USER_WITH_NFT1])
         .rpc(),
@@ -85,13 +79,8 @@ describe("Circle master", () => {
         .updateCircle("ff0000", 50)
         .accounts({
           demo: demoPda,
-          solCerberusApp: appPda,
-          solCerberusRule: null,
-          solCerberusRole: null,
-          solCerberusTokenAcc: tokenAccountPda,
-          solCerberusMetadata: null,
-          solCerberus: SOL_CERBERUS.programId,
           signer: USER_WITH_NFT1.publicKey,
+          ...(await solCerberus.accounts(myRoles, "Circle", "Update")),
         })
         .signers([USER_WITH_NFT1])
         .rpc(),
@@ -99,13 +88,8 @@ describe("Circle master", () => {
         .deleteCircle()
         .accounts({
           demo: demoPda,
-          solCerberusApp: appPda,
-          solCerberusRule: null,
-          solCerberusRole: null,
-          solCerberusTokenAcc: tokenAccountPda,
-          solCerberusMetadata: null,
-          solCerberus: SOL_CERBERUS.programId,
           signer: USER_WITH_NFT1.publicKey,
+          ...(await solCerberus.accounts(myRoles, "Circle", "Delete")),
         })
         .signers([USER_WITH_NFT1])
         .rpc(),
@@ -121,7 +105,7 @@ describe("Circle master", () => {
   });
 
   it("Allow Add", async () => {
-    await SOL_CERBERUS.methods
+    await solCerberus.program.methods
       .addRule({
         namespace: 0,
         role: role,
@@ -134,18 +118,13 @@ describe("Circle master", () => {
         rule: addRulePda,
       })
       .rpc();
-
+    await solCerberus.fetchPerms();
     await DEMO_PROGRAM.methods
       .addCircle("ff0000", 50)
       .accounts({
         demo: demoPda,
-        solCerberusApp: appPda,
-        solCerberusRule: addRulePda,
-        solCerberusRole: rolePda,
-        solCerberusTokenAcc: tokenAccountPda,
-        solCerberusMetadata: null,
-        solCerberus: SOL_CERBERUS.programId,
         signer: USER_WITH_NFT1.publicKey,
+        ...(await solCerberus.accounts(myRoles, "Circle", "Add")),
       })
       .signers([USER_WITH_NFT1])
       .rpc();
@@ -155,7 +134,7 @@ describe("Circle master", () => {
   });
 
   it("Allow Update", async () => {
-    await SOL_CERBERUS.methods
+    await solCerberus.program.methods
       .addRule({
         namespace: 0,
         role: role,
@@ -168,18 +147,13 @@ describe("Circle master", () => {
         rule: updateRulePda,
       })
       .rpc();
-
+    await solCerberus.fetchPerms();
     await DEMO_PROGRAM.methods
       .updateCircle("0f0f0f", 60)
       .accounts({
         demo: demoPda,
-        solCerberusApp: appPda,
-        solCerberusRule: updateRulePda,
-        solCerberusRole: rolePda,
-        solCerberusTokenAcc: tokenAccountPda,
-        solCerberusMetadata: null,
-        solCerberus: SOL_CERBERUS.programId,
         signer: USER_WITH_NFT1.publicKey,
+        ...(await solCerberus.accounts(myRoles, "Circle", "Update")),
       })
       .signers([USER_WITH_NFT1])
       .rpc();
@@ -188,7 +162,7 @@ describe("Circle master", () => {
     expect(demo.circle.color).to.equal("0f0f0f");
   });
   it("Allow Delete", async () => {
-    await SOL_CERBERUS.methods
+    await solCerberus.program.methods
       .addRule({
         namespace: 0,
         role: role,
@@ -201,22 +175,20 @@ describe("Circle master", () => {
         rule: deleteRulePda,
       })
       .rpc();
-
+    await solCerberus.fetchPerms();
     await DEMO_PROGRAM.methods
       .deleteCircle()
       .accounts({
         demo: demoPda,
-        solCerberusApp: appPda,
-        solCerberusRule: deleteRulePda,
-        solCerberusRole: rolePda,
-        solCerberusTokenAcc: tokenAccountPda,
-        solCerberusMetadata: null,
-        solCerberus: SOL_CERBERUS.programId,
         signer: USER_WITH_NFT1.publicKey,
+        ...(await solCerberus.accounts(myRoles, "Circle", "Delete")),
       })
       .signers([USER_WITH_NFT1])
       .rpc();
     let demo = await DEMO_PROGRAM.account.demo.fetch(demoPda);
     expect(demo.circle).to.equal(null);
+  });
+  after(async () => {
+    solCerberus.destroy();
   });
 });
