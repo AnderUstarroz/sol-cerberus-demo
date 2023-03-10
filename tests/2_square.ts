@@ -2,15 +2,11 @@ import {
   sc_app_pda,
   sc_role_pda,
   sc_rule_pda,
-  SolCerberus,
-} from "sol-cerberus-js";
-import {
-  DEMO_PROGRAM,
-  SC_APP_ID,
-  ALLOWED_WALLET,
   addressType,
-  PROVIDER,
-} from "./constants";
+  SolCerberus,
+  namespaces,
+} from "sol-cerberus-js";
+import { DEMO_PROGRAM, SC_APP_ID, ALLOWED_WALLET, PROVIDER } from "./constants";
 import { expect } from "chai";
 import { demo_pda } from "./common";
 
@@ -97,7 +93,7 @@ describe("Square master", () => {
   it("Allow Add", async () => {
     await solCerberus.program.methods
       .addRule({
-        namespace: 0,
+        namespace: namespaces.Default,
         role: role,
         resource: resource,
         permission: addPerm,
@@ -127,7 +123,7 @@ describe("Square master", () => {
   it("Allow Update", async () => {
     await solCerberus.program.methods
       .addRule({
-        namespace: 0,
+        namespace: namespaces.Default,
         role: role,
         resource: resource,
         permission: updatePerm,
@@ -155,7 +151,7 @@ describe("Square master", () => {
   it("Allow Delete", async () => {
     await solCerberus.program.methods
       .addRule({
-        namespace: 0,
+        namespace: namespaces.Default,
         role: role,
         resource: resource,
         permission: deletePerm,

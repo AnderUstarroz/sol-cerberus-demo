@@ -2,12 +2,13 @@ import {
   sc_app_pda,
   sc_role_pda,
   sc_rule_pda,
+  addressType,
   SolCerberus,
+  namespaces,
 } from "sol-cerberus-js";
 import {
   DEMO_PROGRAM,
   SC_APP_ID,
-  addressType,
   METAPLEX,
   USER_WITH_NFT2,
   PROVIDER_WALLET,
@@ -120,7 +121,7 @@ describe("Triangle master", () => {
   it("Allow Add", async () => {
     await solCerberus.program.methods
       .addRule({
-        namespace: 0,
+        namespace: namespaces.Default,
         role: role,
         resource: resource,
         permission: addPerm,
@@ -150,7 +151,7 @@ describe("Triangle master", () => {
   it("Allow Update", async () => {
     await solCerberus.program.methods
       .addRule({
-        namespace: 0,
+        namespace: namespaces.Default,
         role: role,
         resource: resource,
         permission: updatePerm,
@@ -178,7 +179,7 @@ describe("Triangle master", () => {
   it("Allow Delete", async () => {
     await solCerberus.program.methods
       .addRule({
-        namespace: 0,
+        namespace: namespaces.Default,
         role: role,
         resource: resource,
         permission: deletePerm,

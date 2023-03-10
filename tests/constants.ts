@@ -22,12 +22,6 @@ export const USER_WITH_NFT1: anchor.web3.Keypair =
 export const USER_WITH_NFT2: anchor.web3.Keypair =
   anchor.web3.Keypair.generate();
 
-export const addressType: any = {
-  Wallet: { wallet: {} },
-  NFT: { nft: {} },
-  Collection: { collection: {} },
-};
-
 export const METAPLEX = new Metaplex(DEMO_PROGRAM.provider.connection).use(
   keypairIdentity(PROVIDER_WALLET.payer)
 );
