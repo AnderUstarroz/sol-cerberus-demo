@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use errors::*;
 use instructions::*;
-use sol_cerberus_macros::rule;
+use sol_cerberus::sol_cerberus_macros::rule;
 use solana_program::pubkey;
 
 pub mod errors;

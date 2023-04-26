@@ -9,8 +9,8 @@ sol_cerberus_demo = "testX83crd4vAgRrvmwXgVQ2r69uCpg8xzh8A5X124x"
 url = "https://api.apr.dev"
 
 [provider]
-#cluster = "Localnet"
-cluster = "devnet"
+cluster = "Localnet"
+#cluster = "devnet"
 #cluster = "testnet"
 #cluster = "mainnet"
 wallet = "/Users/anderustarroz/.config/solana/SCFV.json"

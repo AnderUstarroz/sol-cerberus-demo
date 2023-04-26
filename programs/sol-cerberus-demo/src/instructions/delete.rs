@@ -1,7 +1,7 @@
 use crate::state::demo::*;
 use anchor_lang::prelude::*;
 use sol_cerberus::program::SolCerberus;
-use sol_cerberus_macros::sol_cerberus_accounts;
+use sol_cerberus::sol_cerberus_macros::sol_cerberus_accounts;
 
 #[sol_cerberus_accounts]
 #[derive(Accounts)]
