@@ -9,6 +9,8 @@ pub mod instructions;
 pub mod state;
 pub mod validation;
 
+const PROGRAM_AUTHORITY: Pubkey = pubkey!("SCfVPLT34pep4pHfnMTzSyMZ2kLcxjKTGS2phuiApz5");
+
 declare_id!("testX83crd4vAgRrvmwXgVQ2r69uCpg8xzh8A5X124x");
 
 // WARNING: Never use the following Pubkey on production!!!
@@ -21,6 +23,10 @@ pub mod sol_cerberus_demo {
 
     pub fn initialize_demo(ctx: Context<InitializeDemo>, sol_cerberus_app: Pubkey) -> Result<()> {
         instructions::initialize_demo::initialize_demo(ctx, sol_cerberus_app)
+    }
+
+    pub fn delete_demo(_ctx: Context<DeleteDemo>) -> Result<()> {
+        Ok(())
     }
 
     #[rule(Square, Add)]

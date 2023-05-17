@@ -1166,9 +1166,9 @@ dependencies = [
 
 [[package]]
 name = "mpl-token-metadata"
-version = "1.10.0"
+version = "1.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f1e674db8846d4a603454ce9c93233dd8d503d62f2afe1b9e6486ce81e431f89"
+checksum = "c8831a402e72f24052d019a83d72b70c38673caaf198e6e345575a77f98166b1"
 dependencies = [
  "arrayref",
  "borsh",
@@ -1798,15 +1798,16 @@ checksum = "a507befe795404456341dfab10cef66ead4c041f62b8b11bbb92bffe5d0953e0"
 
 [[package]]
 name = "sol-cerberus"
-version = "0.1.5"
+version = "0.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "afdee4ad023069290797b2d59d5fca8982c352502746a7da248826fdcde72091"
+checksum = "5a14e38842898114018cad89975e5d5aba44bb77efffb29933f298b10ae242cb"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
  "mpl-token-metadata",
  "sol-cerberus-macros",
  "solana-program",
+ "winnow",
 ]
 
 [[package]]

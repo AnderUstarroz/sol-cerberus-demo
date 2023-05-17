@@ -19,4 +19,4 @@ default = []
 anchor-lang = "0.27.0"
 anchor-spl = { version = "0.27.0", features = ["metadata"] }
 solana-program = "1.15.2"
-sol-cerberus = { version = "0.1.5", features = ["cpi"] }
+sol-cerberus = { version = "0.1.6", features = ["cpi"] }

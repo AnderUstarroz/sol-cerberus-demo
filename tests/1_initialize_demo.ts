@@ -25,6 +25,7 @@ describe("Initialize", () => {
         id: SC_APP_ID,
         recovery: null,
         name: "SolCerberusRBAC",
+        cached: false,
       })
       .accounts({
         app: appPda,
