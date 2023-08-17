@@ -21,10 +21,13 @@ pub struct Add<'info> {
     /// CHECK: Validated on CPI call
     pub sol_cerberus_role: Option<UncheckedAccount<'info>>,
     /// CHECK: Validated on CPI call
-    pub sol_cerberus_token_acc: Option<UncheckedAccount<'info>>,
+    pub sol_cerberus_token: Option<UncheckedAccount<'info>>,
     /// CHECK: Validated on CPI call
     pub sol_cerberus_metadata: Option<UncheckedAccount<'info>>,
+    #[account(mut)]
+    pub sol_cerberus_seed: Option<UncheckedAccount<'info>>,
     pub sol_cerberus: Program<'info, SolCerberus>,
+    pub system_program: Program<'info, System>,
 }
 
 pub fn add(ctx: Context<Add>, shape: &str, color: &String, size: u16) -> Result<()> {

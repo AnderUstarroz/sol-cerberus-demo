@@ -1,6 +1,6 @@
-[submodule "deps/metaplex-program-library"]
-	path = deps/metaplex-program-library
-	url = https://github.com/metaplex-foundation/metaplex-program-library
 [submodule "deps/sol-cerberus"]
 	path = deps/sol-cerberus
 	url = https://github.com/AnderUstarroz/sol-cerberus
+[submodule "deps/mpl-token-metadata"]
+	path = deps/mpl-token-metadata
+	url = https://github.com/metaplex-foundation/mpl-token-metadata

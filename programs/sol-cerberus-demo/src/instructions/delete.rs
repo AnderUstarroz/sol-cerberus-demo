@@ -21,10 +21,13 @@ pub struct Delete<'info> {
     /// CHECK: Validated on CPI call
     pub sol_cerberus_role: Option<UncheckedAccount<'info>>,
     /// CHECK: Validated on CPI call
-    pub sol_cerberus_token_acc: Option<UncheckedAccount<'info>>,
+    pub sol_cerberus_token: Option<UncheckedAccount<'info>>,
     /// CHECK: Validated on CPI call
     pub sol_cerberus_metadata: Option<UncheckedAccount<'info>>,
+    #[account(mut)]
+    pub sol_cerberus_seed: Option<UncheckedAccount<'info>>,
     pub sol_cerberus: Program<'info, SolCerberus>,
+    pub system_program: Program<'info, System>,
 }
 
 pub fn delete(ctx: Context<Delete>, shape: &str) -> Result<()> {
