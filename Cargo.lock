@@ -1884,9 +1884,9 @@ checksum = "62bb4feee49fdd9f707ef802e22365a35de4b7b299de4763d44bfea899442ff9"
 
 [[package]]
 name = "sol-cerberus"
-version = "0.1.7"
+version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f65b676ce5538bae4d55de91e14682632f9833982dad3810fc81f70fb2687f1a"
+checksum = "4068be72ac91638b5bff289e3d99fb4d17271f84f08175ba62b2d3adee41f566"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
@@ -1908,9 +1908,9 @@ dependencies = [
 
 [[package]]
 name = "sol-cerberus-macros"
-version = "0.1.8"
+version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3f88b19a614a647002d6f34ad22386c7be2bdd5be1de3fa7f6b33ca48252a546"
+checksum = "7e9ca5a07f85673a316a1eff60c3b8ac74d9cf5a944c3c4ad3b13a2d19085c31"
 dependencies = [
  "proc-macro2",
  "quote",

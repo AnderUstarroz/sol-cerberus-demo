@@ -2432,10 +2432,10 @@ snake-case@^3.0.4:
     dot-case "^3.0.4"
     tslib "^2.0.3"
 
-sol-cerberus-js@^0.1.6:
-  version "0.1.6"
-  resolved "https://registry.yarnpkg.com/sol-cerberus-js/-/sol-cerberus-js-0.1.6.tgz#17804e1800fca0ed296074adcad6af4b899d8922"
-  integrity sha512-tUX1LcXN0e8Bcgu4mQjxzgaIprSZbMuSW0ycsM4xSdiGGNWehrcQQLPhFViGThR/HSQNB5OU9nN7V+ape3malg==
+sol-cerberus-js@^0.1.7:
+  version "0.1.7"
+  resolved "https://registry.yarnpkg.com/sol-cerberus-js/-/sol-cerberus-js-0.1.7.tgz#f0795b1a123ba769b7aaebdcc7e4e67e0c6106c0"
+  integrity sha512-cJMHatyXr/DdFoGjuPH3wQPKSenekuavl0tl0Sz+XNfQUmaQjoQxiaJ1hkKizRNncWZUNCNgS8io332Bo/MKFA==
   dependencies:
     "@project-serum/anchor" "^0.26.0"
     "@solana/spl-token" "^0.3.8"
