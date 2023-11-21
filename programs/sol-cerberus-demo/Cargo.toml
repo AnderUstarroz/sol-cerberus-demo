@@ -1,6 +1,6 @@
 [package]
 name = "sol-cerberus-demo"
-version = "0.1.0"
+version = "0.1.1"
 description = "Created with Anchor"
 edition = "2021"
 
@@ -14,9 +14,10 @@ no-idl = []
 no-log-ix-name = []
 cpi = ["no-entrypoint"]
 default = []
+idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build"]
 
 [dependencies]
-anchor-lang = "0.28.0"
-anchor-spl = { version = "0.28.0", features = ["metadata"] }
-solana-program = "=1.16.8"
-sol-cerberus = { version = "0.1.11", features = ["cpi"] }
+anchor-lang = "0.29.0"
+anchor-spl = { version = "0.29.0", features = ["metadata"] }
+solana-program = "=1.16.20"
+sol-cerberus = { version = "0.1.12", features = ["cpi"] }

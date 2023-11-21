@@ -14,19 +14,6 @@ pub struct Add<'info> {
         bump = demo.bump
     )]
     pub demo: Box<Account<'info, Demo>>,
-    /// CHECK: Validated on CPI call
-    pub sol_cerberus_app: UncheckedAccount<'info>,
-    /// CHECK: Validated on CPI call
-    pub sol_cerberus_rule: Option<UncheckedAccount<'info>>,
-    /// CHECK: Validated on CPI call
-    pub sol_cerberus_role: Option<UncheckedAccount<'info>>,
-    /// CHECK: Validated on CPI call
-    pub sol_cerberus_token: Option<UncheckedAccount<'info>>,
-    /// CHECK: Validated on CPI call
-    pub sol_cerberus_metadata: Option<UncheckedAccount<'info>>,
-    #[account(mut)]
-    pub sol_cerberus_seed: Option<UncheckedAccount<'info>>,
-    pub sol_cerberus: Program<'info, SolCerberus>,
     pub system_program: Program<'info, System>,
 }
 

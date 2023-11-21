@@ -30,7 +30,7 @@ pub fn initialize_demo(ctx: Context<InitializeDemo>, sol_cerberus_app: Pubkey) -
     let demo = &mut ctx.accounts.demo;
     demo.authority = ctx.accounts.authority.key();
     demo.sol_cerberus_app = sol_cerberus_app;
-    demo.bump = *ctx.bumps.get("demo").unwrap();
+    demo.bump = ctx.bumps.demo;
     demo.square = None;
     demo.circle = None;
     demo.triangle = None;
